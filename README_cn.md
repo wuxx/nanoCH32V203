@@ -31,7 +31,7 @@ nanoCH32V203 是MuseLab基于沁恒CH32V203C8T6芯片推出的开发板，板载
 沁恒官方提供MounRiver Studio IDE开发环境，支持Windows/Linux/Mac，具体使用说明如下
  
 ### MounRiver Studio 下载
-可在官网下载IDE http://www.mounriver.com 选择最新版本下载即可。
+可在官网http://www.mounriver.com下载IDE，选择最新版本下载即可。
 
 ### 编译
 以GPIO工程为例，双击GPIO_Toggle.wvproj打开工程
@@ -47,10 +47,10 @@ nanoCH32V203 是MuseLab基于沁恒CH32V203C8T6芯片推出的开发板，板载
 注：编译生成的二进制文件位于工厂的obj目录下，如EVT\EXAM\GPIO\GPIO_Toggle\obj\GPIO_Toggle.hex
 
 ### WCHISPTool 下载
-可在沁恒官网下载 WCHISPTool https://www.wch.cn/downloads/WCHISPTool_Setup_exe.html
+可在沁恒官网https://www.wch.cn/downloads/WCHISPTool_Setup_exe.html下载WCHISPTool工具
 
 ### WCHISPTool 配置
-![ISP-3](https://github.com/wuxx/nanoCH32V203/blob/master/doc/ISP-3.png)
+![ISP-1](https://github.com/wuxx/nanoCH32V203/blob/master/doc/ISP-1.png)
 
 芯片系列选择CH32Vx系列，芯片型号选择CH32V203，下载方式选择USB。
 持续按住开发板上的BOOT按键，然后按下RST按键并松开，最后再松开BOOT按键，令芯片进入bootloader，若成功进入bootloader，则在ISP工具中的USB设备列表中可检测到目标芯片。
