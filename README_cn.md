@@ -6,6 +6,7 @@ nanoCH32V203
 * [特性](#特性)
 * [芯片资源](#芯片资源)
 * [使用教程](#使用教程)
+* [产品链接](#产品链接)
 * [参考](#参考)
 
 
@@ -31,14 +32,13 @@ nanoCH32V203 是MuseLab基于沁恒CH32V203C8T6芯片推出的开发板，板载
 沁恒官方提供MounRiver Studio IDE开发环境，支持Windows/Linux/Mac，具体使用说明如下
  
 ### MounRiver Studio 下载
-可在官网http://www.mounriver.com下载IDE，选择最新版本下载即可。
+可在官网[MounRiver Studio](http://www.mounriver.com)下载IDE，选择最新版本下载即可。
 
 ### 编译
-以GPIO工程为例，双击GPIO_Toggle.wvproj打开工程
+以GPIO工程为例，双击GPIO_Toggle.wvproj打开工程  
 ![MRS-1](https://github.com/wuxx/nanoCH32V203/blob/master/doc/MRS-1.png)
-![MRS-2](https://github.com/wuxx/nanoCH32V203/blob/master/doc/MRS-2.png)
-
-点击 Project -> Build Project 对工程进行编译
+![MRS-2](https://github.com/wuxx/nanoCH32V203/blob/master/doc/MRS-2.png)  
+点击 Project -> Build Project 对工程进行编译  
 ![MRS-3](https://github.com/wuxx/nanoCH32V203/blob/master/doc/MRS-3.png)
 
 
@@ -47,7 +47,7 @@ nanoCH32V203 是MuseLab基于沁恒CH32V203C8T6芯片推出的开发板，板载
 注：编译生成的二进制文件位于工厂的obj目录下，如EVT\EXAM\GPIO\GPIO_Toggle\obj\GPIO_Toggle.hex
 
 ### WCHISPTool 下载
-可在沁恒官网https://www.wch.cn/downloads/WCHISPTool_Setup_exe.html下载WCHISPTool工具
+可在[沁恒官网](https://www.wch.cn/downloads/WCHISPTool_Setup_exe.html)下载WCHISPTool工具
 
 ### WCHISPTool 配置
 ![ISP-1](https://github.com/wuxx/nanoCH32V203/blob/master/doc/ISP-1.png)
@@ -90,10 +90,8 @@ $sudo /home/pi/.cargo/bin/wchisp info
 $sudo /home/pi/.cargo/bin/wchisp flash ./build/app.bin
 ```
 
-###
-
 # 产品链接
-[nanoCH32V203 Board](https://item.taobao.com/item.htm?spm=a1z10.5-c.w4002-21349689069.14.146848aeEGVAz9&id=652515479052)
+[nanoCH32V203 Board](https://item.taobao.com/item.htm?spm=a1z10.3-c.w4002-21349689064.10.6f55773dXd3CDz&id=689934001629)
 
 # 参考
 ### WCH
