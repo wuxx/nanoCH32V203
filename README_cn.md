@@ -1,6 +1,6 @@
 nanoCH32V203
 -----------
-[中文](./README_cn.md) [English](./README.md)
+[English](./README.md)
 
 * [nanoCH32V203介绍](#nanoCH32V203介绍) 
 * [特性](#特性)

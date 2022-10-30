@@ -1,6 +1,6 @@
 nanoCH32V203
 -----------
-[中文](./README_cn.md) [English](./README.md)
+[中文](./README_cn.md)
 
 * [Introduce](#Introduce)
 * [Feature](#feature)

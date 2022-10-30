@@ -1,0 +1,3 @@
+[submodule "software/CH32V203-makefile-example"]
+	path = software/CH32V203-makefile-example
+	url = https://github.com/wuxx/CH32V203-makefile-example.git
