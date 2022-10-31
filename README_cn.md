@@ -13,9 +13,10 @@ nanoCH32V203
 # nanoCH32V203介绍
 nanoCH32V203 是MuseLab基于沁恒CH32V203C8T6芯片推出的开发板，板载双TYPE-C USB接口，LCD接口，SD卡接口，可通过USB口下载烧录，方便客户进行快速的原型验证及开发。
 
-<div align=center>
-<img src="https://github.com/wuxx/nanoCH32V203/blob/master/doc/1.jpg" width = "500" alt="" align=center />
-</div>
+![3](https://github.com/wuxx/nanoCH32V203/blob/master/doc/3.jpg)
+![4](https://github.com/wuxx/nanoCH32V203/blob/master/doc/4.jpg)
+![5](https://github.com/wuxx/nanoCH32V203/blob/master/doc/5.jpg)
+
 
 # 特性
 - 双USB接口，其中USB1支持Device，USB2支持Host/Device
