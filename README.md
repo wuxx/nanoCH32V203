@@ -14,7 +14,7 @@ nanoCH32V203
 nanoCH32V203 is a development board made by MuseLab based on WCH CH32V203C8T6. Dual TYPE-C USB interfaces, LCD interface and SD card interface onboard, can be downloaded and burned through the USB port, which is convenient for prototype verification and development.
 
 <div align=center>
-<img src="https://github.com/wuxx/nanoCH32V203/blob/master/doc/nanoESP32-C3-1.jpg" width = "500" alt="" align=center />
+<img src="https://github.com/wuxx/nanoCH32V203/blob/master/doc/1.jpg" width = "500" alt="" align=center />
 </div>
 
 # Feature
