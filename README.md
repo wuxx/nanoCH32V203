@@ -11,7 +11,7 @@ nanoCH32V203
 
 
 # Introduce
-nanoCH32V203 is a development board made by MuseLab based on WCH CH32V203C8T6. Dual TYPE-C USB interfaces, LCD interface and SD card interface onboard, can be downloaded and burned through the USB port, which is convenient for prototype verification and development.
+nanoCH32V203 is a development board made by MuseLab based on WCH CH32V203C8T6 with Dual TYPE-C USB interfaces, LCD interface and SD card interface onboard, can be programmed through the USB port, which is convenient for prototype verification and development.
 
 ![3](https://github.com/wuxx/nanoCH32V203/blob/master/doc/3.jpg)
 ![4](https://github.com/wuxx/nanoCH32V203/blob/master/doc/4.jpg)
@@ -43,14 +43,14 @@ Click Project -> Build Project to compile the project
 
 
 ## Program
-If use WCH's official downloader WCHLink, click Flash -> Download to program the flash. If you use the USB1 port for program, the operation instructions are as follows
+If use WCH's official downloader WCHLink, click Flash -> Download to program the flash. If you use the USB1 port for program, the operation instructions are as follows  
 Note: The compiled binary file is located in the obj directory of the factory, such as EVT\EXAM\GPIO\GPIO_Toggle\obj\GPIO_Toggle.hex
 
 ### WCHISPTool Download
 download WCHISPTool at [WCH Official Website](https://www.wch.cn/downloads/WCHISPTool_Setup_exe.html)
 
 ### WCHISPTool Config
-![ISP-1](https://github.com/wuxx/nanoCH32V203/blob/master/doc/ISP-1.png)
+![ISP-2](https://github.com/wuxx/nanoCH32V203/blob/master/doc/ISP-2.png)
 
 The chip series select CH32Vx series, the chip model select CH32V203, and the download method select USB.
 Keep pressing the BOOT button on the development board, then press and release the RST button, and finally release the BOOT button to make the chip enter the bootloader. If the bootloader is successfully entered, the target can be detected in the USB device list in the WCHISPTool.
@@ -72,7 +72,7 @@ $make
 ```
 
 ### Program
-use the open source download tool wchisp to program the flash, the operation is as follows
+use the open source download tool wchisp to program the flash, the operation is as follows  
 wchisp is a tool written in rust, first update rustc
 ```
 $rustc -V
@@ -91,7 +91,9 @@ $sudo /home/pi/.cargo/bin/wchisp flash ./build/app.bin
 ```
 
 # Product Link
-[nanoCH32V203 Board](https://item.taobao.com/item.htm?spm=a1z10.5-c.w4002-21349689069.14.146848aeEGVAz9&id=652515479052)
+[Aliexpress](https://www.aliexpress.com/item/1005004908206775.html?spm=5261.ProductManageOnline.0.0.6b234edfStGkJN  
+)
+[Tindie](https://www.tindie.com/products/johnnywu/nanoch32v203-development-board/)
 
 # Reference
 ### WCH
