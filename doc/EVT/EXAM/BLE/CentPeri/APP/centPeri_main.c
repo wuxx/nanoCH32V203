@@ -26,6 +26,23 @@ const uint8_t MacAddr[6] = {0x84, 0xC2, 0xE4, 0x03, 0x02, 0x02};
 #endif
 
 /*********************************************************************
+ * @fn      Main_Circulation
+ *
+ * @brief   主循环
+ *
+ * @return  none
+ */
+__attribute__((section(".highcode")))
+__attribute__((noinline))
+void Main_Circulation(void)
+{
+    while(1)
+    {
+        TMOS_SystemProcess();
+    }
+}
+
+/*********************************************************************
  * @fn      main
  *
  * @brief   主函数
@@ -45,10 +62,7 @@ int main(void)
     GAPRole_CentralInit();
     Peripheral_Init();
     Central_Init();
-    while(1)
-    {
-        TMOS_SystemProcess();
-    }
+    Main_Circulation();
 }
 
 /******************************** endfile @ main ******************************/

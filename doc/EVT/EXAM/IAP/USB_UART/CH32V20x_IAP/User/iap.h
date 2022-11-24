@@ -38,7 +38,7 @@
 typedef struct __attribute__ ((aligned(4)))_ISP_CMD {
     u8 Cmd;
     u8 Len;
-    u8 adr[2];
+    u8 Rev[2];
     u8 data[60];
 } isp_cmd;
 
@@ -57,7 +57,7 @@ void GPIO_Cfg_init(void);
 u8 PA0_Check(void);
 void EP2_RecData_Deal(void);
 void EP2_IN_Tx_Deal(void);
-void USART1_CFG(u32 baudrate);
+void USART3_CFG(u32 baudrate);
 
 void UART_Rx_Deal(void);
 

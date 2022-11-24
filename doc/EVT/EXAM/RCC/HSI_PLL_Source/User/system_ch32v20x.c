@@ -70,56 +70,71 @@ void SystemInit (void)
  */
 void SystemCoreClockUpdate (void)
 {
-    uint32_t tmp = 0, pllmull = 0, pllsource = 0, Pll_6_5 = 0;
+  uint32_t tmp = 0, pllmull = 0, pllsource = 0, Pll_6_5 = 0;
 
-    tmp = RCC->CFGR0 & RCC_SWS;
+  tmp = RCC->CFGR0 & RCC_SWS;
 
-    switch (tmp)
-    {
-      case 0x00:
-        SystemCoreClock = HSI_VALUE;
-        break;
-      case 0x04:
-        SystemCoreClock = HSE_VALUE;
-        break;
-      case 0x08:
-        pllmull = RCC->CFGR0 & RCC_PLLMULL;
-        pllsource = RCC->CFGR0 & RCC_PLLSRC;
-        pllmull = ( pllmull >> 18) + 2;
+  switch (tmp)
+  {
+    case 0x00:
+      SystemCoreClock = HSI_VALUE;
+      break;
+    case 0x04:
+      SystemCoreClock = HSE_VALUE;
+      break;
+    case 0x08:
+      pllmull = RCC->CFGR0 & RCC_PLLMULL;
+      pllsource = RCC->CFGR0 & RCC_PLLSRC;
+      pllmull = ( pllmull >> 18) + 2;
 
-        if(pllmull == 17) pllmull = 18;
+      if(pllmull == 17) pllmull = 18;
 
-        if (pllsource == 0x00)
+      if (pllsource == 0x00)
+      {
+          if(EXTEN->EXTEN_CTR & EXTEN_PLL_HSI_PRE){
+              SystemCoreClock = HSI_VALUE * pllmull;
+          }
+          else{
+              SystemCoreClock = (HSI_VALUE >> 1) * pllmull;
+          }
+      }
+      else
+      {
+#if defined (CH32V20x_D8W)
+        if((RCC->CFGR0 & (3<<22)) == (3<<22))
         {
-			if(EXTEN->EXTEN_CTR & EXTEN_PLL_HSI_PRE){
-				SystemCoreClock = (HSI_VALUE) * pllmull;
-			}
-			else{
-				SystemCoreClock = (HSI_VALUE >>1) * pllmull;
-			}
+          SystemCoreClock = ((HSE_VALUE>>1)) * pllmull;
+        }
+        else
+#endif
+        if ((RCC->CFGR0 & RCC_PLLXTPRE) != (uint32_t)RESET)
+        {
+#if defined (CH32V20x_D8) || defined (CH32V20x_D8W)
+          SystemCoreClock = ((HSE_VALUE>>2) >> 1) * pllmull;
+#else
+          SystemCoreClock = (HSE_VALUE >> 1) * pllmull;
+#endif
         }
         else
         {
-          if ((RCC->CFGR0 & RCC_PLLXTPRE) != (uint32_t)RESET)
-          {
-            SystemCoreClock = (HSE_VALUE >> 1) * pllmull;
-          }
-          else
-          {
-            SystemCoreClock = HSE_VALUE * pllmull;
-          }
+#if defined (CH32V20x_D8) || defined (CH32V20x_D8W)
+            SystemCoreClock = (HSE_VALUE>>2) * pllmull;
+#else
+          SystemCoreClock = HSE_VALUE * pllmull;
+#endif
         }
+      }
 
-        if(Pll_6_5 == 1) SystemCoreClock = (SystemCoreClock / 2);
+      if(Pll_6_5 == 1) SystemCoreClock = (SystemCoreClock / 2);
 
-        break;
-      default:
-        SystemCoreClock = HSI_VALUE;
-        break;
-    }
+      break;
+    default:
+      SystemCoreClock = HSI_VALUE;
+      break;
+  }
 
-    tmp = AHBPrescTable[((RCC->CFGR0 & RCC_HPRE) >> 4)];
-    SystemCoreClock >>= tmp;
+  tmp = AHBPrescTable[((RCC->CFGR0 & RCC_HPRE) >> 4)];
+  SystemCoreClock >>= tmp;
 }
 
 

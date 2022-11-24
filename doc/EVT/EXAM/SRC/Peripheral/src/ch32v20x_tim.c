@@ -88,6 +88,9 @@ void TIM_TimeBaseInit(TIM_TypeDef *TIMx, TIM_TimeBaseInitTypeDef *TIM_TimeBaseIn
         tmpcr1 |= (uint32_t)TIM_TimeBaseInitStruct->TIM_CounterMode;
     }
 
+    tmpcr1 &= (uint16_t)(~((uint16_t)TIM_CTLR1_CKD));
+    tmpcr1 |= (uint32_t)TIM_TimeBaseInitStruct->TIM_ClockDivision;
+
     TIMx->CTLR1 = tmpcr1;
     TIMx->ATRLR = TIM_TimeBaseInitStruct->TIM_Period;
     TIMx->PSC = TIM_TimeBaseInitStruct->TIM_Prescaler;

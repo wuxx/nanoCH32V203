@@ -232,7 +232,7 @@ void vPortEndScheduler( void )
 	for( ;; );
 }
 /*-----------------------------------------------------------*/
-void SysTick_Handler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
+void SysTick_Handler(void) __attribute__((interrupt()));
 void SysTick_Handler( void )
 {
     GET_INT_SP();

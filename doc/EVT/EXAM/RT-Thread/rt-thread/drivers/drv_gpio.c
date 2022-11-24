@@ -54,7 +54,7 @@ static void GPIOD_CLK_ENABLE(void)
 
 
 
-/* STM32 GPIO driver */
+/* GPIO driver */
 struct pin_index
 {
     int index;
@@ -643,12 +643,12 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 }
 
 
-void EXTI0_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
-void EXTI1_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
-void EXTI2_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
-void EXTI3_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
-void EXTI4_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
-void EXTI9_5_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
+void EXTI0_IRQHandler(void) __attribute__((interrupt()));
+void EXTI1_IRQHandler(void) __attribute__((interrupt()));
+void EXTI2_IRQHandler(void) __attribute__((interrupt()));
+void EXTI3_IRQHandler(void) __attribute__((interrupt()));
+void EXTI4_IRQHandler(void) __attribute__((interrupt()));
+void EXTI9_5_IRQHandler(void) __attribute__((interrupt()));
 
 void EXTI0_IRQHandler(void)
 {

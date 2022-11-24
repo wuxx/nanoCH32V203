@@ -14,7 +14,7 @@
 extern "C" {
 #endif
 
-#if !defined(CH32V20x_D8W) && !defined(CH32V20x_D8) && !defined(CH32V20x_D8)
+#if !defined(CH32V20x_D8W) && !defined(CH32V20x_D8) && !defined(CH32V20x_D6)
 #define CH32V20x_D6              /* CH32V203F6-CH32V203F8-CH32V203G6-CH32V203G8-CH32V203K6-CH32V203K8-CH32V203C6-CH32V203C8 */
 //#define CH32V20x_D8              /* CH32V203RBT6 */
 //#define CH32V20x_D8W             /* CH32V208 */
@@ -4654,7 +4654,7 @@ typedef struct
 #define  RB_ETH_EIE_RXIE        0x40                  /* RW Receive complete interrupt enable */
 #define  RB_ETH_EIE_LINKIE      0x10                  /* RW Link Change Interrupt Enable */
 #define  RB_ETH_EIE_TXIE        0x08                  /* RW send complete interrupt enable */
-#define  RB_ETH_EIE_R_EN50      0x04                  /* RW TX 50¦¸ resistor adjustment. 1: On-chip 50¦¸ connected 0: On-chip 50¦¸ disconnected */
+#define  RB_ETH_EIE_R_EN50      0x04                  /* RW TX 50ï¿½ï¿½ resistor adjustment. 1: On-chip 50ï¿½ï¿½ connected 0: On-chip 50ï¿½ï¿½ disconnected */
 #define  RB_ETH_EIE_TXERIE      0x02                  /* RW Transmit Error Interrupt Enable */
 #define  RB_ETH_EIE_RXERIE      0x01                  /* RW1 receive error flag */
 #define R8_ETH_EIR              (*((volatile uint8_t *)(0x40028000+4))) /* Interrupt Flag Register */
@@ -4704,23 +4704,11 @@ typedef struct
 /* RW 0=Do not enable this filter condition, 1=When ANDOR=1,
 target address mismatch will be filtered, when ANDOR=0, target address match will be accepted */
 #define  RB_ETH_ERXFCON_UCEN    0x80
-/* RW 1=AND, all the filter conditions are satisfied before
-the packet is received 0=OR, any filter condition is satisfied and the packet is received */
-#define  RB_ETH_ERXFCON_ANDOR   0x40
-/* RW 0=Do not enable this filter condition, 1=When ANDOR=1,
-CRC check error will be filtered, when ANDOR=0, CRC check error will be received */
 #define  RB_ETH_ERXFCON_CRCEN   0x20
-/* RW 0=Do not enable this filter condition, 1=When ANDOR=1,
- non-magic packets will be filtered, when ANDOR=0, magic packets will be received */
+#define  RB_ETH_ERXFCON_EN      0x10
 #define  RB_ETH_ERXFCON_MPEN    0x08
-/* RW 0=Do not enable this filter condition, 1=When ANDOR=1,
-hash table mismatch will be filtered, when ANDOR=0, hash table match will be accepted */
 #define  RB_ETH_ERXFCON_HTEN    0x04
-/* RW 0=Do not enable this filter condition, 1=When ANDOR=1,
- multicast packets that do not match will be filtered, and when ANDOR=0, multicast packets that match will be received */
 #define  RB_ETH_ERXFCON_MCEN    0x02
-/* RW 0=Do not enable this filter condition, 1=When ANDOR=1,
-non-broadcast packets will be filtered, when ANDOR=0, broadcast packets will be received */
 #define  RB_ETH_ERXFCON_BCEN    0x01
 #define R8_ETH_MACON1           (*((volatile uint8_t *)(0x40028000+0x19))) /* Mac flow control registers */
 /* RW When FULDPX=0 is invalid, when FULDPX=1, 11=send 0 timer pause frame,
@@ -4810,6 +4798,10 @@ with 00h to 64 bytes, otherwise the short packet is filled with 60 bytes of 0, a
 
 /* Bit or field definition for PHY basic status register */
 #define PHY_Linked_Status       ((uint16_t)0x0004)      /* Valid link established */
+
+#define PHY_Reset                               ((uint16_t)0x8000)      /* PHY Reset */
+
+#define PHY_AutoNego_Complete                   ((uint16_t)0x0020)      /* Auto-Negotioation process completed */
 
 //MII control
 #define  RB_ETH_MIREGADR_MIIWR  0x20                                            /* WO MII write command */

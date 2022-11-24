@@ -44,11 +44,11 @@ typedef struct
     uint16_t connTimeout;
 } peripheralConnItem_t;
 
-RingMemParm_t RingMemUSB;
-uint8_t RingMemUSBBuf[2048];
-RingMemParm_t RingMemBLE;
-uint8_t RingMemBLEBuf[2048];
-uint8_t Peripheral_TaskID;
+extern RingMemParm_t RingMemUSB;
+extern uint8_t RingMemUSBBuf[2048];
+extern RingMemParm_t RingMemBLE;
+extern uint8_t RingMemBLEBuf[2048];
+extern uint8_t Peripheral_TaskID;
 /*********************************************************************
  * FUNCTIONS
  */

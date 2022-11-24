@@ -10,6 +10,10 @@
 #ifndef __ETH_DRIVER__
 #define __ETH_DRIVER__
 
+#ifdef __cplusplus
+ extern "C" {
+#endif 
+
 /* definition for Ethernet frame */
 #define ETH_MAX_PACKET_SIZE    1536    /* ETH_HEADER + ETH_EXTRA + MAX_ETH_PAYLOAD + ETH_CRC */
 #define ETH_HEADER               14    /* 6 byte Dest addr, 6 byte Src addr, 2 byte length/type */
@@ -48,17 +52,30 @@ typedef struct
 #include "debug.h"
 #include "wchnet.h"
 
-#define USE_10M_BASE                         1  // Internal 10M PHY
+#define USE_10M_BASE                            1  // Internal 10M PHY
 
 #ifndef PHY_MODE
-#define PHY_MODE                             USE_10M_BASE
+#define PHY_MODE                                USE_10M_BASE
 #endif
 
-#define PHY_ADDRESS                          1
+#define ETH_DMARxDesc_FrameLengthShift          16
 
-#define ETH_DMARxDesc_FrameLengthShift       16
+#define ROM_CFG_USERADR_ID                      0x1FFFF7E8
 
-#define ROM_CFG_USERADR_ID                   0x1FFFF7E8
+#define PHY_LINK_TASK_PERIOD                    100
+
+#define PHY_ANLPAR_SELECTOR_FIELD               0x1F
+#define PHY_ANLPAR_SELECTOR_VALUE               0x01       // 5B'00001
+
+#define PHY_LINK_INIT                           0x00
+#define PHY_LINK_SUC_P                          (1<<0)
+#define PHY_LINK_SUC_N                          (1<<1)
+#define PHY_LINK_WAIT_SUC                       (1<<7)
+
+
+#define PHY_PN_SWITCH_P                         (0<<2)
+#define PHY_PN_SWITCH_N                         (1<<2)
+#define PHY_PN_SWITCH_AUTO                      (2<<2)
 
 #ifndef WCHNETTIMERPERIOD
 #define WCHNETTIMERPERIOD             10   /* Timer period, in Ms. */
@@ -66,15 +83,20 @@ typedef struct
 
 extern SOCK_INF SocketInf[ ];
 
-void ETH_Init( uint8_t *macAddr );
+
 void ETH_PHYLink( void );
-void ETH_Configuration( uint8_t *macAddr );
+void WCHNET_ETHIsr( void );
+void WCHNET_MainTask( void );
 void ETH_LedConfiguration(void);
+void ETH_Init( uint8_t *macAddr );
 void ETH_LedLinkSet( uint8_t mode );
 void ETH_LedDataSet( uint8_t mode );
+void WCHNET_TimeIsr( uint16_t timperiod );
+void ETH_Configuration( uint8_t *macAddr );
 uint8_t ETH_LibInit( uint8_t *ip, uint8_t *gwip, uint8_t *mask, uint8_t *macaddr);
 
-void WCHNET_MainTask( void );
-void WCHNET_ETHIsr( void );
-void WCHNET_TimeIsr( uint16_t timperiod );
+#ifdef __cplusplus
+}
+#endif
+
 #endif

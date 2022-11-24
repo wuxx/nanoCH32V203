@@ -1,8 +1,8 @@
 /********************************** (C) COPYRIGHT *******************************
  * File Name          : mesh_lib.h
  * Author             : WCH
- * Version            : V1.6
- * Date               : 2022/07/04
+ * Version            : V1.65
+ * Date               : 2022/09/05
  * Description        :
  * Copyright (c) 2021 Nanjing Qinheng Microelectronics Co., Ltd.
  *******************************************************************************/
@@ -1003,6 +1003,14 @@ struct bt_mesh_app_key
     } keys[2];
 };
 
+// reply
+struct bt_mesh_rpl {
+    u16_t src;
+    BOOL  old_iv;
+    BOOL  store;
+    u32_t seq;
+};
+
 /************************************model******************************************/
 
 struct bt_mesh_model;
@@ -1863,7 +1871,7 @@ typedef void (*friend_state_cb_t)( uint16_t lpn_addr, uint8_t state );
 #define LPN_FRIENDSHIP_TERMINATED       0x02
 
 typedef int (*lpn_init_cb_t)( void );
-typedef void (*lpn_state_cb_t)( uint8_t state );
+typedef void (*lpn_state_cb_t)( uint16_t friend_addr, uint8_t state );
 
 /*****************************************app_rf*************************************/
 
@@ -3531,7 +3539,9 @@ void bt_mesh_reset( void );
 void ble_sm_alg_ecc_init( void );
 
 /**
- * @brief Get iv index.
+ * @brief Get IV index.
+ *
+ * @return IV index.
  */
 uint32_t bt_mesh_iv_index_get( void );
 
@@ -3541,6 +3551,31 @@ uint32_t bt_mesh_iv_index_get( void );
  * @param[in] net_idx   Net index
  */
 uint8_t bt_mesh_net_flags_get( uint16_t net_idx );
+
+/**
+ * @brief Get SEQ number.
+ *
+ * @return SEQ number.
+ */
+uint32_t bt_mesh_seq_get( void );
+
+/**
+ * @brief Set SEQ number.
+ *
+ * @param[in] new_seq   New SEQ number, shall be less than 0xb0e500 and greater than current SEQ.
+ *
+ * @return @ref Global_Error_Code.
+ */
+int bt_mesh_seq_set( uint32_t new_seq );
+
+/**
+ * @brief Get RPL list.
+ *
+ * @param[in] rpl   Buffer to copy RPL list, the size of the buffer should not be less than CONFIG_MESH_RPL_COUNT_DEF.
+ *
+ * @return RPL list struct.
+ */
+struct bt_mesh_rpl* bt_mesh_rpl_list_get( struct bt_mesh_rpl *rpl );
 
 /******************************************************************************/
 

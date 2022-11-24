@@ -8,14 +8,24 @@
 * SPDX-License-Identifier: Apache-2.0
 *******************************************************************************/ 
 
-/*
- *@Note
- 模拟HID兼容设备，支持中断上下传，支持控制端点上下传，支持全速传输。
-     - PA0低电平发送HIDTxBuffer中的数据。
-     - OUT数据保存到HIDRxBuffer中并打印输出。
- 注：本例程需与上位机软件配合演示。
-
-*/
+/* @Note
+ * Compatibility HID Example:
+ * This program provides examples of the pass-through of USB-HID data and serial port
+ *  data based on compatibility HID device. And the data returned by Get_Report request is
+ *  the data sent by the last Set_Report request.Speed of UART1/2 is 115200bps.
+ *
+ * Interrupt Transfers:
+ *   UART2_RX   ---> Endpoint1
+ *   Endpoint2  ---> UART2_TX
+ *
+ *   Note that the first byte is the valid data length and the remaining bytes are
+ *   the transmission data for interrupt Transfers.
+ *
+ * Control Transfers:
+ *   Set_Report ---> UART1_TX
+ *   Get_Report <--- last Set_Report packet
+ *
+ *  */
 
 #include "debug.h"
 #include "usb_lib.h"
@@ -23,27 +33,30 @@
 #include "hw_config.h"
 #include "usb_pwr.h"
 #include "usb_prop.h"
+#include "usbd_compatibility_hid.h"
 /* Global define */
 
 
 /* Global Variable */    
-extern uint8_t HIDTxBuffer[],HIDRxBuffer[];
 
 /*********************************************************************
- * @fn      GPIO_Key_Init
+ * @fn      Var_Init
  *
- * @brief   GPIO Key Init : PA0
+ * @brief   Software parameter initialization
  *
  * @return  none
  */
-void GPIO_Key_Init()
+void Var_Init(void)
 {
-	GPIO_InitTypeDef GPIO_InitStructure;
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0; 
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;	
-	GPIO_Init(GPIOA, &GPIO_InitStructure);
+    uint16_t i;
+    RingBuffer_Comm.LoadPtr = 0;
+    RingBuffer_Comm.StopFlag = 0;
+    RingBuffer_Comm.DealPtr = 0;
+    RingBuffer_Comm.RemainPack = 0;
+    for(i=0; i<DEF_Ring_Buffer_Max_Blks; i++)
+    {
+        RingBuffer_Comm.PackLen[i] = 0;
+    }
 }
 
 
@@ -56,30 +69,34 @@ void GPIO_Key_Init()
  */
 int main(void)
 {   
-    uint8_t i;
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 	Delay_Init(); 
     USART_Printf_Init(115200);
 	printf("SystemClk:%d\r\n",SystemCoreClock);
-	printf("USBD CompatibilityHID Demo\r\n");
-	GPIO_Key_Init();
-	Set_USBConfig(); 
-    USB_Init();	    
-	USB_Port_Set(DISABLE, DISABLE);	
-	Delay_Ms(700);
-	USB_Port_Set(ENABLE, ENABLE);
- 	USB_Interrupts_Config();    
- 	
-    for(i = 0;i< ENDP2_IN_SIZE;i++) HIDTxBuffer[i] = i;
+	printf("USBHD Compatibility HID Example\r\n");
+    /* Variables init */
+    Var_Init();
+
+    /* UART2 init */
+    UART2_Init();
+    UART2_DMA_Init();
+
+    /* Timer init */
+    TIM2_Init();
+
+    /* USBD init */
+    Set_USBConfig();
+    USB_Init();
+    USB_Interrupts_Config();
     
-	while(1)
-	{
-		if (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) == 0)
-		{
-            USBD_HID_Data_Updata();
-		}
-        Delay_Ms(100);
-	}
+    while(1)
+    {
+        if( bDeviceState == CONFIGURED )
+        {
+            UART2_Rx_Service();
+            UART2_Tx_Service();
+        }
+    }
 }
 
 

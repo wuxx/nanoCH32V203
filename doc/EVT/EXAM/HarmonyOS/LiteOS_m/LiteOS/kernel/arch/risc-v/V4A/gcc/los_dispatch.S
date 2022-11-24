@@ -172,9 +172,9 @@ HalStartToRun:
 .extern HalTaskSwitch
 
 .section    .text.vector_handler, "ax", @progbits
-.global SW_handler
+.global SW_Handler
 .align 2
-SW_handler:
+SW_Handler:
 
 #ifdef ARCH_RISCV_FPU
     addi    sp, sp, -portFloatRegNum * FPREGBYTES
@@ -244,8 +244,8 @@ SW_handler:
     STORE x31, 28 * REGBYTES(sp)
 #endif
 
-    li   t0,    0x20
-	csrs 0x804, t0
+//    li   t0,    0x20
+//	csrs 0x804, t0
 
     /* Push mstatus to stack */
     csrr t0, CSR_MSTATUS

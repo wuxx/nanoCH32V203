@@ -367,9 +367,26 @@ void button_changed(uint8_t keys)
 }
 
 /*********************************************************************
+ * @fn      Main_Circulation
+ *
+ * @brief   Ö÷Ñ­»·
+ *
+ * @return  none
+ */
+__attribute__((section(".highcode")))
+__attribute__((noinline))
+void Main_Circulation(void)
+{
+    while(1)
+    {
+        TMOS_SystemProcess();
+    }
+}
+
+/*********************************************************************
  * @fn      main
  *
- * @brief   æ¶“è¯²åš±éï¿½
+ * @brief   æ¶“è¯²åš±éï¿?
  *
  * @return  none
  */
@@ -389,10 +406,7 @@ int main(void)
     ancs_subscribe_cb_register(&subscribe);
     GAPRole_PeripheralInit();
     peripheral_ancs_client_init();
-    while(1)
-    {
-        TMOS_SystemProcess();
-    }
+    Main_Circulation();
 }
 
 /******************************** endfile @ main ******************************/

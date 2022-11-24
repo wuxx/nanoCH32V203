@@ -41,9 +41,13 @@ const uint16_t MemSize[8] = {WCHNET_MEM_ALIGN_SIZE(WCHNET_SIZE_IPRAW_PCB),
  __attribute__((__aligned__(4)))uint8_t Mem_Heap_Memory[WCHNET_RAM_HEAP_SIZE];
  __attribute__((__aligned__(4)))uint8_t Mem_ArpTable[WCHNET_RAM_ARP_TABLE_SIZE];
 
-uint16_t gPHYAddress;
 uint32_t volatile LocalTime;
 ETH_DMADESCTypeDef *DMATxDescToSet;
+
+uint32_t phyLinkTime;
+uint8_t  phyLinkStatus=0;
+uint8_t  phyStatus=0;
+uint8_t  phyPN=0;
 
 ETH_DMADESCTypeDef *DMARxDescToGet;
 ETH_DMADESCTypeDef *pDMARxSet;
@@ -81,6 +85,121 @@ void WCHNET_TimeIsr( uint16_t timperiod )
 }
 
 /*********************************************************************
+ * @fn      WritePHYReg
+ *
+ * @brief   MCU write PHY register.
+ *
+ * @param   reg_add - PHY address,
+ *          reg_val - value you want to write.
+ *
+ * @return  none
+ */
+void WritePHYReg(uint8_t reg_add,uint16_t reg_val)
+{
+    R32_ETH_MIWR = (reg_add & RB_ETH_MIREGADR_MIRDL) | (1<<8) | (reg_val<<16);
+}
+
+/*********************************************************************
+ * @fn      ReadPHYReg
+ *
+ * @brief   MCU read PHY register.
+ *
+ * @param   reg_add - PHY address.
+ *
+ * @return  value you want to get.
+ */
+uint16_t ReadPHYReg(uint8_t reg_add)
+{
+    R8_ETH_MIREGADR = reg_add;                          // write address
+    return R16_ETH_MIRD;                                // get data
+}
+
+/*********************************************************************
+ * @fn      WCHNET_LinkProcess
+ *
+ * @brief   link process.
+ *
+ * @param   none.
+ *
+ * @return  none.
+ */
+void WCHNET_LinkProcess( void )
+{
+    uint32_t phy_anlpar;
+
+    phy_anlpar = ReadPHYReg(PHY_ANLPAR);
+
+    if( (phy_anlpar&PHY_ANLPAR_SELECTOR_FIELD) )
+    {
+        if( !(phyLinkStatus&PHY_LINK_WAIT_SUC) )
+        {
+            if( phyPN == PHY_PN_SWITCH_P )
+            {
+                phyLinkStatus = PHY_LINK_WAIT_SUC;
+            }
+            else
+            {
+                if( !(phyLinkStatus&PHY_LINK_SUC_N) )
+                {
+                    phyLinkStatus |= PHY_LINK_SUC_N;
+                    phyPN ^= PHY_PN_SWITCH_N;
+                    WritePHYReg(PHY_BMCR, PHY_Reset);
+                    Delay_Us(10);
+                    WritePHYReg(PHY_MDIX, phyPN);
+                }
+                else
+                {
+                    phyLinkStatus = PHY_LINK_WAIT_SUC;
+                }
+            }
+        }
+    }
+    else
+    {
+        if( phyLinkStatus == PHY_LINK_WAIT_SUC )
+        {
+            phyLinkStatus = PHY_LINK_INIT;
+        }
+        else
+        {
+            if( phyPN == PHY_PN_SWITCH_P )
+            {
+                phyLinkStatus &= ~PHY_LINK_SUC_P;
+            }
+            else if( phyPN == PHY_PN_SWITCH_N )
+            {
+                phyLinkStatus &= ~PHY_LINK_SUC_N;
+            }
+            phyPN ^= PHY_PN_SWITCH_N;
+            WritePHYReg(PHY_BMCR, PHY_Reset);
+            Delay_Us(10);
+            WritePHYReg(PHY_MDIX, phyPN);
+        }
+    }
+}
+
+/*********************************************************************
+ * @fn      WCHNET_HandlePhyNegotiation
+ *
+ * @brief   Handle PHY Negotiation.
+ *
+ * @param   none.
+ *
+ * @return  none.
+ */
+void WCHNET_HandlePhyNegotiation(void)
+{
+    if( !phyStatus )                        /* Handling PHY Negotiation Exceptions */
+    {
+        if( LocalTime - phyLinkTime >= PHY_LINK_TASK_PERIOD )  /* 100ms cycle timing call */
+        {
+            phyLinkTime = LocalTime;
+            WCHNET_LinkProcess( );
+        }
+    }
+}
+
+/*********************************************************************
  * @fn      WCHNET_MainTask
  *
  * @brief   library main task function
@@ -91,6 +210,7 @@ void WCHNET_MainTask(void)
 {
     WCHNET_NetInput( );         /* Ethernet data input */
     WCHNET_PeriodicHandle( );   /* Protocol stack time-related task processing */
+    WCHNET_HandlePhyNegotiation( );
 }
 
 /*********************************************************************
@@ -152,37 +272,6 @@ void ETH_LedConfiguration(void)
 }
 
 /*********************************************************************
- * @fn      WritePHYReg
- *
- * @brief   MCU write PHY register.
- *
- * @param   reg_add - PHY address,
- *          reg_val - value you want to write.
- *
- * @return  none
- */
-void WritePHYReg(uint8_t reg_add,uint16_t reg_val)
-{
-    R8_ETH_MIREGADR = reg_add;                              // write address
-    R16_ETH_MIWR = reg_val;                                 // write data
-}
-
-/*********************************************************************
- * @fn      ReadPHYReg
- *
- * @brief   MCU read PHY register.
- *
- * @param   reg_add - PHY address.
- *
- * @return  value you want to get.
- */
-uint16_t ReadPHYReg(uint8_t reg_add)
-{
-    R8_ETH_MIREGADR = reg_add;                          // write address
-    return R16_ETH_MIRD;                                // get data
-}
-
-/*********************************************************************
  * @fn      ETH_DMATxDescChainInit
  *
  * @brief   Initializes the DMA Tx descriptors in chain mode.
@@ -217,7 +306,7 @@ void ETH_DMATxDescChainInit(ETH_DMADESCTypeDef *DMATxDescTab, uint8_t *TxBuff, u
  */
 void ETH_DMARxDescChainInit(ETH_DMADESCTypeDef *DMARxDescTab, uint8_t *RxBuff, uint32_t RxBuffCount)
 {
-    uint32_t i = 0;
+    uint8_t i = 0;
     ETH_DMADESCTypeDef *DMARxDesc;
 
     DMARxDescToGet = DMARxDescTab;
@@ -293,12 +382,12 @@ void ETH_Configuration( uint8_t *macAddr )
 
     //Filter mode, received packet type
     R8_ETH_ERXFCON = 0;
-    R8_ETH_MAADRL1 = macAddr[0];                                        // MAC assignment
-    R8_ETH_MAADRL2 = macAddr[1];
-    R8_ETH_MAADRL3 = macAddr[2];
-    R8_ETH_MAADRL4 = macAddr[3];
-    R8_ETH_MAADRL5 = macAddr[4];
-    R8_ETH_MAADRL6 = macAddr[5];
+    R8_ETH_MAADRL1 = macAddr[5];                                        // MAC assignment
+    R8_ETH_MAADRL2 = macAddr[4];
+    R8_ETH_MAADRL3 = macAddr[3];
+    R8_ETH_MAADRL4 = macAddr[2];
+    R8_ETH_MAADRL5 = macAddr[1];
+    R8_ETH_MAADRL6 = macAddr[0];
 
     //Filter mode, limit packet type
     R8_ETH_MACON1 |= RB_ETH_MACON1_MARXEN;                              //MAC receive enable
@@ -348,26 +437,31 @@ void ETH_PHYLink( void )
 
     if((phy_stat&(PHY_Linked_Status))&&(phy_anlpar == 0)){      //restart negotiation
         RegValue = ReadPHYReg(PHY_BMCR);
-        RegValue |= (1<<15);
-        WritePHYReg(PHY_BMCR,RegValue);
+        RegValue |= PHY_Reset;
+        WritePHYReg(PHY_BMCR, RegValue);
         EXTEN->EXTEN_CTR &= ~EXTEN_ETH_10M_EN;
         Delay_Ms(500);
         EXTEN->EXTEN_CTR |= EXTEN_ETH_10M_EN;
         return;
     }
     WCHNET_PhyStatus( phy_stat );
-    if( phy_anlpar&(1<<6) )
+
+    if( (phy_stat&(PHY_Linked_Status)) && (phy_stat&PHY_AutoNego_Complete) )
     {
-        RegValue = ReadPHYReg(PHY_BMCR);
-        RegValue |= (1<<12);
-        RegValue &= ~(1<<9);
-        RegValue |= (1<<8);
-        WritePHYReg(PHY_BMCR,RegValue);
-        R8_ETH_MACON2 |= RB_ETH_MACON2_FULDPX;
+        if( phy_anlpar&(1<<6) )
+        {
+            R8_ETH_MACON2 |= RB_ETH_MACON2_FULDPX;
+        }
+        else
+        {
+            R8_ETH_MACON2 &= ~RB_ETH_MACON2_FULDPX;
+        }
+        phyStatus = PHY_Linked_Status;
     }
     else
     {
-        R8_ETH_MACON2 &= ~RB_ETH_MACON2_FULDPX;
+        phyStatus = 0;
+        phyLinkStatus = PHY_LINK_INIT;
     }
 }
 
@@ -380,15 +474,23 @@ void ETH_PHYLink( void )
  */
 void WCHNET_ETHIsr( void )
 {
-    uint8_t eth_irq_flag;
+    uint8_t eth_irq_flag, estat_regval;
 
     eth_irq_flag = R8_ETH_EIR;
     if(eth_irq_flag&RB_ETH_EIR_RXIF)                                //Receive complete
     {
+        R8_ETH_EIR = RB_ETH_EIR_RXIF;
         /* Check if the descriptor is owned by the ETHERNET DMA */
         if( DMARxDescToGet->Status & ETH_DMARxDesc_OWN )
         {
-            if( ((ETH_DMADESCTypeDef*)(DMARxDescToGet->Buffer2NextDescAddr))->Status& ETH_DMARxDesc_OWN ){
+            estat_regval = R8_ETH_ESTAT;
+            if(estat_regval & \
+                    (RB_ETH_ESTAT_BUFER | RB_ETH_ESTAT_RXCRCER | RB_ETH_ESTAT_RXNIBBLE | RB_ETH_ESTAT_RXMORE))
+            {
+                return;
+            }
+            if( ((ETH_DMADESCTypeDef*)(DMARxDescToGet->Buffer2NextDescAddr))->Status& ETH_DMARxDesc_OWN )
+            {
                 DMARxDescToGet->Status &= ~ETH_DMARxDesc_OWN;
                 DMARxDescToGet->Status &= ~ETH_DMARxDesc_ES;
                 DMARxDescToGet->Status |= (ETH_DMARxDesc_FS|ETH_DMARxDesc_LS);
@@ -400,7 +502,6 @@ void WCHNET_ETHIsr( void )
                 R16_ETH_ERXST = DMARxDescToGet->Buffer1Addr;
             }
         }
-        R8_ETH_EIR = RB_ETH_EIR_RXIF;
     }
     if(eth_irq_flag&RB_ETH_EIR_TXIF)                                //send completed
     {
@@ -433,6 +534,7 @@ void WCHNET_ETHIsr( void )
 void ETH_Init( uint8_t *macAddr )
 {
     ETH_LedConfiguration( );
+    Delay_Ms(100);
     ETH_Configuration( macAddr );
     ETH_DMATxDescChainInit(DMATxDscrTab, MACTxBuf, ETH_TXBUFNB);
     ETH_DMARxDescChainInit(DMARxDscrTab, MACRxBuf, ETH_RXBUFNB);
@@ -465,11 +567,11 @@ uint8_t ETH_LibInit( uint8_t *ip, uint8_t *gwip, uint8_t *mask, uint8_t *macaddr
     cfg.net_send = ETH_TxPktChainMode;
     cfg.CheckValid = WCHNET_CFG_VALID;
     s = WCHNET_ConfigLIB(&cfg);
-    if( s ){
+    if(s){
        return (s);
     }
     s = WCHNET_Init(ip,gwip,mask,macaddr);
-    ETH_Init( macaddr );
+    ETH_Init(macaddr);
     return (s);
 }
 

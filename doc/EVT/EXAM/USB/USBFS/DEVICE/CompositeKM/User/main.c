@@ -2,188 +2,93 @@
  * File Name          : main.c
  * Author             : WCH
  * Version            : V1.0.0
- * Date               : 2021/06/06
+ * Date               : 2020/04/30
  * Description        : Main program body.
  * Copyright (c) 2021 Nanjing Qinheng Microelectronics Co., Ltd.
  * SPDX-License-Identifier: Apache-2.0
  *******************************************************************************/
 
 /*
- *@Note
-    模拟自定义USB设备（CH372设备）例程：
-  OTG_FS_DM(PA11)、OTG_FS_DP(PA12)
-    模拟HID键盘设备，短接PA0键盘打印wch.cn，鼠标先移动至坐标（360*360）,再移动至（1080*1080），再左键点击一下。
-    使用杜邦线短接开发板上排针KEY和PA0
-*/
+ * @Note
+ * Composite Keyboard and Mouse Example:
+ * This example uses PB12-PB15 and PA4-PA7 to simulate keyboard key pressing and mouse
+ * movement respectively, active low.
+ * At the same time, it also uses USART2(PA3) to receive the specified data sent from
+ * the host to simulate the pressing and releasing of the following specific keyboard
+ * keys. Data is sent in hexadecimal format and 1 byte at a time.
+ * 'W' -> 0x1A
+ * 'A' -> 0x04
+ * 'S' -> 0x16
+ * 'D' -> 0x07
+ */
 
-#include "debug.h"
-#include "ch32v20x_usbotg_device.h"
+/*
+ * @Note
+ * In addition, when the system frequency is selected as the USB clock source, only 144MHz/96MHz/48MHz
+ * are supported.
+ */
 
-/* Value */
-UINT8 KeyStatus[ 8 ] = { 0x00 };
-UINT8 MouseStatus[ 7 ] = { 0x00 };
 
-/* Function statement */
-void GPIO_Config( void );
-UINT8 Basic_Key_Handle( void );
+/*******************************************************************************/
+/* Header Files */
+#include "ch32v20x_usbfs_device.h"
+#include "usbd_composite_km.h"
 
 /*********************************************************************
  * @fn      main
  *
- * @brief   Main program.
+ * @brief   Main program
  *
  * @return  none
  */
-int main(void)
+int main( void )
 {
-    UINT8 i;
-    UINT8  UpLoadFlag = 0x00;
-    UINT16 x_pix_val = 0;/* 绝对鼠标x坐标值 */
-    UINT16 y_pix_val = 0;/* 绝对鼠标y坐标值 */
-	Delay_Init();
-	USART_Printf_Init(115200);
-	printf("SystemClk:%d\r\n",SystemCoreClock);
+    /* Initialize system configuration */
+    NVIC_PriorityGroupConfig( NVIC_PriorityGroup_2 );
+	Delay_Init( );
+	USART_Printf_Init( 115200 );
+	printf( "SystemClk:%d\r\n", SystemCoreClock );
 
-    /* USBOTG_FS device init */
-	printf( "CH372Device Running On USBOTG_FS Controller\n" );
-	Delay_Ms(10);
-	USBOTG_Init( );
+	/* Initialize USART2 for receiving the specified keyboard data */
+	USART2_Init( 115200 );
+	printf( "USART2 Init OK!\r\n" );
 
-    /* GPIO Config */
-    GPIO_Config( );
+	/* Initialize GPIO for keyboard scan */
+	KB_Scan_Init( );
+	KB_Sleep_Wakeup_Cfg( );
+	printf( "KB Scan Init OK!\r\n" );
 
-	while(1)
-	{
-        if( Basic_Key_Handle( ) )
-        {
-            if( UpLoadFlag == 0 )
-            {
-                printf( "KeyDown\n" );
-                for( i=0; i<7; i++ )
-                {
-                    KeyStatus[i] = 0;
-                    MouseStatus[i] = 0;
-                }
-                KeyStatus[7] = 0;
-                /* KeyBoard */
-                KeyStatus[ 2 ] = 0x00;
-                Ep1_Tx( (UINT8*)KeyStatus, 8 );
-                KeyStatus[ 2 ] = 0x00;
-                Ep1_Tx( (UINT8*)KeyStatus, 8 );
-                /* w */
-                KeyStatus[ 2 ] = 0x1A;
-                Ep1_Tx( (UINT8*)KeyStatus, 8 );
-                KeyStatus[ 2 ] = 0x00;
-                Ep1_Tx( (UINT8*)KeyStatus, 8 );
-                /* c */
-                KeyStatus[ 2 ] = 0x06;
-                Ep1_Tx( (UINT8*)KeyStatus, 8 );
-                KeyStatus[ 2 ] = 0x00;
-                Ep1_Tx( (UINT8*)KeyStatus, 8 );
-                /* h */
-                KeyStatus[ 2 ] = 0x0B;
-                Ep1_Tx( (UINT8*)KeyStatus, 8 );
-                KeyStatus[ 2 ] = 0x00;
-                Ep1_Tx( (UINT8*)KeyStatus, 8 );
-                /* . */
-                KeyStatus[ 2 ] = 0x37;
-                Ep1_Tx( (UINT8*)KeyStatus, 8 );
-                KeyStatus[ 2 ] = 0x00;
-                Ep1_Tx( (UINT8*)KeyStatus, 8 );
-                /* c */
-                KeyStatus[ 2 ] = 0x06;
-                Ep1_Tx( (UINT8*)KeyStatus, 8 );
-                KeyStatus[ 2 ] = 0x00;
-                Ep1_Tx( (UINT8*)KeyStatus, 8 );
-                /* n */
-                KeyStatus[ 2 ] = 0x11;
-                Ep1_Tx( (UINT8*)KeyStatus, 8 );
-                KeyStatus[ 2 ] = 0x00;
-                Ep1_Tx( (UINT8*)KeyStatus, 8 );
-                /* 回车 */
-                KeyStatus[ 2 ] = 0x28;
-                Ep1_Tx( (UINT8*)KeyStatus, 8 );
-                KeyStatus[ 2 ] = 0x00;
-                Ep1_Tx( (UINT8*)KeyStatus, 8 );
-                Delay_Ms( 500 );
-                /* Mouse */
-                MouseStatus[ 0 ] = 0x02;
-                /* Move around */
-                x_pix_val = 360;
-                for( y_pix_val=360; y_pix_val<1080; y_pix_val+=16 )
-                {
-                    MouseStatus[ 2 ] = (UINT8)x_pix_val;/* X_Val_l */
-                    MouseStatus[ 3 ] = (UINT8)(x_pix_val>>8);/* X_Val_h */
-                    MouseStatus[ 4 ] = (UINT8)y_pix_val;/* Y_Val_l */
-                    MouseStatus[ 5 ] = (UINT8)(y_pix_val>>8);/* Y_Val_h */
-                    Ep2_Tx( (UINT8*)MouseStatus, 7 );
-                    MouseStatus[ 2 ] = 0x00;/* X_Val_l */
-                    MouseStatus[ 3 ] = 0x00;/* X_Val_h */
-                    MouseStatus[ 4 ] = 0x00;/* Y_Val_l */
-                    MouseStatus[ 5 ] = 0x00;/* Y_Val_h */
-                    Ep2_Tx( (UINT8*)MouseStatus, 7 );
-                    x_pix_val += 16;
-                }
-                /* Left click */
-                MouseStatus[ 1 ] = 0x01;
-                Ep2_Tx( (UINT8*)MouseStatus, 7 );
-                MouseStatus[ 1 ] = 0x00;
-                Ep2_Tx( (UINT8*)MouseStatus, 7 );
-                Delay_Ms( 100 );
-                UpLoadFlag = 1;
-                printf( "KeyDown Finish\n" );
-            }
-        }
-        else
-        {
-            if( UpLoadFlag )
-            {
-                UpLoadFlag = 0;
-                printf( "KeyUP\n" );
-            }
-        }
-	}
-}
+	/* Initialize GPIO for mouse scan */
+	MS_Scan_Init( );
+	MS_Sleep_Wakeup_Cfg( );
+	printf( "MS Scan Init OK!\r\n" );
 
-/*********************************************************************
- * @fn      GPIO_Config
- *
- * @brief   GPIO Configuration Program
- *
- * @return  none
- */
-void GPIO_Config( void )
-{
-    GPIO_InitTypeDef GPIO_InitTypdefStruct;
+	/* Initialize timer for Keyboard and mouse scan timing */
+	TIM3_Init( 1, SystemCoreClock / 10000 - 1 );
+	printf( "TIM3 Init OK!\r\n" );
 
-    RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOA, ENABLE );
-    GPIO_InitTypdefStruct.GPIO_Pin   = GPIO_Pin_0;
-    GPIO_InitTypdefStruct.GPIO_Mode  = GPIO_Mode_IPU;
-    GPIO_InitTypdefStruct.GPIO_Speed = GPIO_Speed_50MHz;
+	/* Initialize USBHD interface to communicate with the host  */
+	USBFS_RCC_Init( );
+	USBFS_Device_Init( ENABLE );
+	USB_Sleep_Wakeup_CFG( );
 
-    GPIO_Init( GPIOA, &GPIO_InitTypdefStruct );
-}
+	printf("USBHD Composite KM Device Test\r\n");
 
-/*********************************************************************
- * @fn      Basic_Key_Handle
- *
- * @brief   Basic Key Handle
- *
- * @return  0 - no key press
- *          1 - key press down
- */
-UINT8 Basic_Key_Handle( void )
-{
-    UINT8 keyval = 0;
-    if( ! GPIO_ReadInputDataBit( GPIOA, GPIO_Pin_0 ) )
+	while( 1 )
     {
-        Delay_Ms(30);
-        if( ! GPIO_ReadInputDataBit( GPIOA, GPIO_Pin_0 ) )
-        {
-            keyval = 1;
-        }
+	    if( USBFS_DevEnumStatus )
+	    {
+	        /* Handle keyboard scan data */
+	        KB_Scan_Handle(  );
+
+	        /* Handle keyboard lighting */
+	        KB_LED_Handle( );
+
+            /* Handle mouse scan data */
+            MS_Scan_Handle( );
+
+            /* Handle USART2 receiving data */
+            USART2_Receive_Handle( );
+	    }
     }
-    return keyval;
 }
-
-

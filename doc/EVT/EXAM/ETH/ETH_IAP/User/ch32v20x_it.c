@@ -15,7 +15,7 @@ void NMI_Handler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
 void HardFault_Handler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
 void ETH_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
 void TIM2_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
-void SW_handler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
+void SW_Handler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
 
 /*********************************************************************
  * @fn      NMI_Handler
@@ -71,13 +71,13 @@ void TIM2_IRQHandler(void)
 }
 
 /*********************************************************************
- * @fn      SW_handler
+ * @fn      SW_Handler
  *
  * @brief   This function handles Software exception.
  *
  * @return  none
  */
-void SW_handler(void) {
+void SW_Handler(void) {
     __asm("li  a6, 0xA000");
     __asm("jr  a6");
 

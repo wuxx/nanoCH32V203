@@ -180,7 +180,7 @@ LITE_OS_SEC_TEXT_INIT int main(void)
  *
  * @return  none
  */
-void EXTI0_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
+void EXTI0_IRQHandler(void) __attribute__((interrupt()));
 void EXTI0_IRQHandler(void)
 {
   /* 中断栈使用的是原来调用main设置的值，将中断栈和线程栈分开，这样线程跳中断，中断函数如果嵌套深度较大，不至于

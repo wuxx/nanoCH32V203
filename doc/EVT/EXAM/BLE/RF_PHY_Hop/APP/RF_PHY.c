@@ -45,24 +45,24 @@ void RF_2G4StatusCallBack(uint8_t sta, uint8_t crc, uint8_t *rxBuf)
         }
         case TX_MODE_RX_DATA:
         {
-            if(crc == 1)
-            {
-                PRINT("crc error\n");
-            }
-            else if(crc == 2)
-            {
-                PRINT("match type error\n");
-            }
-            else
-            {
+            if (crc == 0) {
                 uint8_t i;
+
                 PRINT("tx recv,rssi:%d\n", (int8_t)rxBuf[0]);
                 PRINT("len:%d-", rxBuf[1]);
-                for(i = 0; i < rxBuf[1]; i++)
-                {
+
+                for (i = 0; i < rxBuf[1]; i++) {
                     PRINT("%x ", rxBuf[i + 2]);
                 }
                 PRINT("\n");
+            } else {
+                if (crc & (1<<0)) {
+                    PRINT("crc error\n");
+                }
+
+                if (crc & (1<<1)) {
+                    PRINT("match type error\n");
+                }
             }
             break;
         }
@@ -79,24 +79,24 @@ void RF_2G4StatusCallBack(uint8_t sta, uint8_t crc, uint8_t *rxBuf)
 
         case RX_MODE_RX_DATA:
         {
-            if(crc == 1)
-            {
-                PRINT("crc error\n");
-            }
-            else if(crc == 2)
-            {
-                PRINT("match type error\n");
-            }
-            else
-            {
+            if (crc == 0) {
                 uint8_t i;
+
                 PRINT("rx recv, rssi: %d\n", (int8_t)rxBuf[0]);
-                PRINT("len: %d-", rxBuf[1]);
-                for(i = 0; i < rxBuf[1]; i++)
-                {
+                PRINT("len:%d-", rxBuf[1]);
+                
+                for (i = 0; i < rxBuf[1]; i++) {
                     PRINT("%x ", rxBuf[i + 2]);
                 }
                 PRINT("\n");
+            } else {
+                if (crc & (1<<0)) {
+                    PRINT("crc error\n");
+                }
+
+                if (crc & (1<<1)) {
+                    PRINT("match type error\n");
+                }
             }
             break;
         }

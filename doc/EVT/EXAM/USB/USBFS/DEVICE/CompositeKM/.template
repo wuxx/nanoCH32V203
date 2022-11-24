@@ -1,6 +1,5 @@
 Mcu Type=CH32V20x
 Address=0x08000000
-Target Path=obj/CompositeKM_HD_FS.hex
 Erase All=true
 Program=true
 Verify=true
@@ -14,3 +13,4 @@ Description=ROM(byte): 64K, SRAM(byte): 20K, CHIP PINS: 32, GPIO PORTS: 27.\nWCH
 
 PeripheralVersion=1.0
 MCU=CH32V203RBT6
+Target Path=obj/CompositeKM.hex

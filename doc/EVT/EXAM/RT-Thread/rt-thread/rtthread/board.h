@@ -18,9 +18,9 @@
 #define __BOARD_H__
 
 #include "ch32v20x.h"
-#define ch32v20x_PIN_NUMBERS   68
+#define ch32v20x_PIN_NUMBERS   48
 /* board configuration */
-#define SRAM_SIZE  32
+#define SRAM_SIZE  20
 #define SRAM_END (0x20000000 + SRAM_SIZE * 1024)
 
 extern int _ebss;

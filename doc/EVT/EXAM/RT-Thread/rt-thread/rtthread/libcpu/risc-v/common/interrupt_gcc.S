@@ -10,9 +10,9 @@
  
 #include "cpuport.h"
 
-.global SW_handler
+.global SW_Handler
 .align 2
-SW_handler:
+SW_Handler:
     /* save all from thread context */
 #ifdef ARCH_RISCV_FPU
     addi    sp, sp, -32 * FREGBYTES
@@ -58,8 +58,8 @@ SW_handler:
     STORE t0,   2 * REGBYTES(sp)
 
 	/* Temporarily disable HPE  */
-	li   t0,    0x20
-	csrs 0x804, t0
+//	li   t0,    0x20
+//	csrs 0x804, t0
 
     STORE x1,   1 * REGBYTES(sp)
     STORE x4,   4 * REGBYTES(sp)

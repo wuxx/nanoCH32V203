@@ -27,6 +27,23 @@ uint8_t const MacAddr[6] = {0x84, 0xC2, 0xE4, 0x03, 0x02, 0x02};
 extern void app_uart_process(void);
 extern void app_uart_init(void);
 
+/*********************************************************************
+ * @fn      Main_Circulation
+ *
+ * @brief   主循环
+ *
+ * @return  none
+ */
+__attribute__((section(".highcode")))
+__attribute__((noinline))
+void Main_Circulation(void)
+{
+    while(1)
+    {
+        TMOS_SystemProcess();
+    }
+}
+
 /*******************************************************************************
  * Function Name  : main
  * Description    : 主函数
@@ -46,11 +63,7 @@ int main(void)
     GAPRole_PeripheralInit();
     Peripheral_Init();
     app_uart_init();
-    while(1)
-    {
-        TMOS_SystemProcess();
-        app_uart_process();
-    }
+    Main_Circulation();
 }
 
 /******************************** endfile @ main ******************************/

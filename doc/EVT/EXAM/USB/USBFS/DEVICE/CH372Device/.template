@@ -1,6 +1,6 @@
 Mcu Type=CH32V20x
 Address=0x08000000
-Target Path=obj/CH372Device_HD_FS.hex
+Target Path=obj/CH372Device.hex
 Erase All=true
 Program=true
 Verify=true

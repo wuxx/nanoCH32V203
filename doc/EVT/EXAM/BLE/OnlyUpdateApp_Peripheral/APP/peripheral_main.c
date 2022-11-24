@@ -30,6 +30,23 @@ const uint32_t Address = 0xFFFFFFFF;
 __attribute__((aligned(4))) uint32_t Image_Flag __attribute__((section(".ImageFlag"))) = (uint32_t)&Address;
 
 /*********************************************************************
+ * @fn      Main_Circulation
+ *
+ * @brief   主循环
+ *
+ * @return  none
+ */
+__attribute__((section(".highcode")))
+__attribute__((noinline))
+void Main_Circulation(void)
+{
+    while(1)
+    {
+        TMOS_SystemProcess();
+    }
+}
+
+/*********************************************************************
  * @fn      main
  *
  * @brief   主函数
@@ -47,10 +64,7 @@ int main(void)
     HAL_Init();
     GAPRole_PeripheralInit();
     Peripheral_Init();
-    while(1)
-    {
-        TMOS_SystemProcess();
-    }
+    Main_Circulation();
 }
 
 /******************************** endfile @ main ******************************/

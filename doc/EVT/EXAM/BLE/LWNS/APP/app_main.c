@@ -44,6 +44,23 @@ uint8_t const MacAddr[6] = {0x84,0xC2,0xE4,0x03,0x02,0x02};
 #endif
 
 /*********************************************************************
+ * @fn      Main_Circulation
+ *
+ * @brief   Ö÷Ñ­»·
+ *
+ * @return  none
+ */
+__attribute__((section(".highcode")))
+__attribute__((noinline))
+void Main_Circulation(void)
+{
+    while(1)
+    {
+        TMOS_SystemProcess();
+    }
+}
+
+/*********************************************************************
  * @fn      main
  *
  * @brief   Ö÷º¯Êý
@@ -71,9 +88,6 @@ int main(void)
   //lwns_uninetflood_process_init();//µ¥²¥ÍøÂç·ººé
   //lwns_multinetflood_process_init();//×é²¥ÍøÂç·ººé
   //lwns_mesh_process_init();//mesh×éÍø
-    while(1)
-    {
-        TMOS_SystemProcess();
-    }
+    Main_Circulation();
 }
 /******************************** endfile @ main ******************************/

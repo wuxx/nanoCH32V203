@@ -105,7 +105,7 @@ at the top of this file. */
 #define portCONTEXT_SIZE ( 30 * portWORD_SIZE )
 
 .global xPortStartFirstTask
-.global SW_handler
+.global SW_Handler
 .global pxPortInitialiseStack
 
 .extern pxCurrentTCB
@@ -114,7 +114,7 @@ at the top of this file. */
 /*-----------------------------------------------------------*/
 .align 8
 .func
-SW_handler:
+SW_Handler:
 	addi sp, sp, -portCONTEXT_SIZE
 	store_x x1, 1 * portWORD_SIZE( sp )
 	store_x x5, 2 * portWORD_SIZE( sp )
@@ -156,8 +156,8 @@ SW_handler:
 	csrr a1, mepc
 	store_x a1, 0( sp )					/* Save updated exception return address. */
 
-	addi a1, x0, 0x20                   /* Disable HPE */
-	csrs 0x804, a1
+//	addi a1, x0, 0x20                   /* Disable HPE */
+//	csrs 0x804, a1
 
 	load_x sp, xISRStackTop				/* Switch to ISR stack before function call. */
 	jal vTaskSwitchContext

@@ -14,6 +14,10 @@
 #include "stdio.h"
 #include "ch32v20x.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* UART Printf Definition */
 #define DEBUG_UART1    1
 #define DEBUG_UART2    2
@@ -34,4 +38,9 @@ void USART_Printf_Init(uint32_t baudrate);
 #else
   #define PRINT(X...)
 #endif
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

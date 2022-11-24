@@ -17,7 +17,7 @@
 /* Global define */
 
 /* LED0通过rt的pin驱动接口驱动  */
-#define LED0_PIN  11   //PC3
+#define LED0_PIN  11   //PA0
 
 /* Global Variable */
 

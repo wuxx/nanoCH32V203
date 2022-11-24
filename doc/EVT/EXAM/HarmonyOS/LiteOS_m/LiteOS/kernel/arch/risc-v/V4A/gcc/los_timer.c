@@ -76,7 +76,7 @@ WEAK UINT32 HalTickStart(OS_TICK_HANDLER handler)
 
 
 
-void SysTick_Handler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
+void SysTick_Handler(void) __attribute__((interrupt()));
 #define HalTickSysTickHandler  SysTick_Handler
 
 void HalTickSysTickHandler( void )

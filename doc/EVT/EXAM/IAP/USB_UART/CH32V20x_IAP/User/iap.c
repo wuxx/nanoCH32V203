@@ -18,8 +18,8 @@
 #define FLASH_Base   0x08005000
 #define USBD_DATA_SIZE               64
 iapfun jump2app;
-u32 Program_addr = 0;
-u32 Verity_addr = 0;
+u32 Program_addr = FLASH_Base;
+u32 Verity_addr = FLASH_Base;
 u32 User_APP_Addr_offset = 0x5000;
 u8 Verity_Star_flag = 0;
 u8 Fast_Program_Buf[390];
@@ -40,11 +40,10 @@ u8 EP2_Rx_Buffer[USBD_DATA_SIZE];
 
 u8 RecData_Deal(void)
 {
-    u8 i, s, Lenth;
-     u16 OffsetAdr;
+     u8 i, s, Lenth;
 
      Lenth = isp_cmd_t->Len;
-     OffsetAdr = BUILD_UINT16(isp_cmd_t->adr[0], isp_cmd_t->adr[1]);
+
      switch ( isp_cmd_t->Cmd) {
      case CMD_IAP_ERASE:
          FLASH_Unlock_Fast();
@@ -52,7 +51,6 @@ u8 RecData_Deal(void)
          break;
 
      case CMD_IAP_PROM:
-         Program_addr = FLASH_Base + (u32) (OffsetAdr & 0xFF00);
          for (i = 0; i < Lenth; i++) {
              Fast_Program_Buf[CodeLen + i] = isp_cmd_t->data[i];
          }
@@ -85,8 +83,6 @@ u8 RecData_Deal(void)
              CodeLen = 0;
          }
 
-         Verity_addr = FLASH_Base + (u32)  (OffsetAdr );
-
          s = ERR_SCUESS;
          for (i = 0; i < Lenth; i++) {
              if (isp_cmd_t->data[i] != *(u8*) (Verity_addr + i)) {
@@ -95,11 +91,16 @@ u8 RecData_Deal(void)
              }
          }
 
+         Verity_addr += Lenth;
+
          break;
 
      case CMD_IAP_END:
          Verity_Star_flag = 0;
          End_Flag = 1;
+         Program_addr = FLASH_Base;
+         Verity_addr = FLASH_Base;
+
          s = ERR_End;
          break;
 
@@ -197,29 +198,27 @@ u8 PA0_Check(void)
 }
 
 /*********************************************************************
- * @fn      USART1_CFG
+ * @fn      USART3_CFG
  *
- * @brief   baudrate:UART1 baudrate
+ * @brief   baudrate:UART3 baudrate
  *
  * @return  none
  */
-void USART1_CFG(u32 baudrate)
+void USART3_CFG(u32 baudrate)
 {
     GPIO_InitTypeDef GPIO_InitStructure = {0};
     USART_InitTypeDef USART_InitStructure = {0};
 
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1 | RCC_APB2Periph_GPIOA, ENABLE);
-
-    //PA9
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
+    RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOB, ENABLE);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3,ENABLE);
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-    GPIO_Init(GPIOA, &GPIO_InitStructure);
+    GPIO_Init(GPIOB, &GPIO_InitStructure);
 
-    //PA10
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-    GPIO_Init(GPIOA, &GPIO_InitStructure);
+    GPIO_Init(GPIOB, &GPIO_InitStructure);
 
     USART_InitStructure.USART_BaudRate = baudrate;
     USART_InitStructure.USART_WordLength = USART_WordLength_8b;
@@ -229,57 +228,57 @@ void USART1_CFG(u32 baudrate)
     USART_HardwareFlowControl_None;
     USART_InitStructure.USART_Mode = USART_Mode_Tx | USART_Mode_Rx;
 
-    USART_Init(USART1, &USART_InitStructure);
-    USART_Cmd(USART1, ENABLE);
+    USART_Init(USART3, &USART_InitStructure);
+    USART_Cmd(USART3, ENABLE);
 }
 /*********************************************************************
- * @fn      UART1_SendMultiyData
+ * @fn      UART3_SendMultiyData
  *
- * @brief   Deal device Endpoint 1 OUT.
+ * @brief   Deal device Endpoint 3 OUT.
  *
  * @param   l: Data length.
  *
  * @return  none
  */
-void UART1_SendMultiyData(u8* pbuf, u8 num)
+void UART3_SendMultiyData(u8* pbuf, u8 num)
 {
     u8 i = 0;
 
     while(i<num)
     {
-        while(USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET);
-        USART_SendData(USART1, pbuf[i]);
+        while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
+        USART_SendData(USART3, pbuf[i]);
         i++;
     }
 }
 /*********************************************************************
- * @fn      UART1_SendMultiyData
+ * @fn      UART3_SendMultiyData
  *
- * @brief   USART1 send date
+ * @brief   USART3 send date
  *
  * @param   pbuf - Packet to be sent
  *          num - the number of date
  *
  * @return  none
  */
-void UART1_SendData(u8 data)
+void UART3_SendData(u8 data)
 {
-    while(USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET);
-    USART_SendData(USART1, data);
+    while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
+    USART_SendData(USART3, data);
 
 }
 
 /*********************************************************************
- * @fn      Uart1_Rx
+ * @fn      Uart3_Rx
  *
- * @brief   Uart1 receive date
+ * @brief   Uart3 receive date
  *
  * @return  none
  */
-u8 Uart1_Rx(void)
+u8 Uart3_Rx(void)
 {
-    while( USART_GetFlagStatus(USART1, USART_FLAG_RXNE) == RESET);
-    return USART_ReceiveData( USART1);
+    while( USART_GetFlagStatus(USART3, USART_FLAG_RXNE) == RESET);
+    return USART_ReceiveData( USART3);
 }
 
 /*********************************************************************
@@ -294,41 +293,41 @@ void UART_Rx_Deal(void)
     u8 i, s;
     u8 Data_add = 0;
 
-    if (Uart1_Rx() == Uart_Sync_Head1)
+    if (Uart3_Rx() == Uart_Sync_Head1)
     {
-        if (Uart1_Rx() == Uart_Sync_Head2)
+        if (Uart3_Rx() == Uart_Sync_Head2)
         {
-            isp_cmd_t->Cmd = Uart1_Rx();
+            isp_cmd_t->Cmd = Uart3_Rx();
             Data_add += isp_cmd_t->Cmd;
-            isp_cmd_t->Len = Uart1_Rx();
+            isp_cmd_t->Len = Uart3_Rx();
             Data_add += isp_cmd_t->Len;
-            isp_cmd_t->adr[0] = Uart1_Rx();
-            Data_add += isp_cmd_t->adr[0];
-            isp_cmd_t->adr[1] = Uart1_Rx();
-            Data_add += isp_cmd_t->adr[1];
+            isp_cmd_t->Rev[0] = Uart3_Rx();
+            Data_add += isp_cmd_t->Rev[0];
+            isp_cmd_t->Rev[1] = Uart3_Rx();
+            Data_add += isp_cmd_t->Rev[1];
 
             if ((isp_cmd_t->Cmd == CMD_IAP_PROM) || (isp_cmd_t->Cmd == CMD_IAP_VERIFY))
             {
                 for (i = 0; i < isp_cmd_t->Len; i++) {
-                    isp_cmd_t->data[i] = Uart1_Rx();
+                    isp_cmd_t->data[i] = Uart3_Rx();
                     Data_add += isp_cmd_t->data[i];
                 }
             }
 
-            if (Uart1_Rx() == Data_add)
+            if (Uart3_Rx() == Data_add)
             {
                 s = RecData_Deal();
 
                 if (s != ERR_End)
                 {
-                    UART1_SendData(0x00);
+                    UART3_SendData(0x00);
                     if (s == ERR_ERROR)
                     {
-                        UART1_SendData(0x01);
+                        UART3_SendData(0x01);
                     }
                     else
                     {
-                        UART1_SendData(0x00);
+                        UART3_SendData(0x00);
                     }
                 }
             }

@@ -11,7 +11,7 @@
 
 void NMI_Handler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
 void HardFault_Handler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
-void SW_handler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
+void SW_Handler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
 /*********************************************************************
  * @fn      NMI_Handler
  *
@@ -43,7 +43,7 @@ void HardFault_Handler(void)
  *
  * @return  none
  */
-void SW_handler(void) {
+void SW_Handler(void) {
     __asm("li  a6, 0x5000");
     __asm("jr  a6");
 

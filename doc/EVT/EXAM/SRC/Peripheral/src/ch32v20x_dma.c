@@ -72,10 +72,6 @@ void DMA_DeInit(DMA_Channel_TypeDef *DMAy_Channelx)
     {
         DMA1->INTFCR |= DMA1_Channel7_IT_Mask;
     }
-    else if(DMAy_Channelx == DMA1_Channel7)
-    {
-        DMA1->INTFCR |= DMA1_Channel7_IT_Mask;
-    }
     else if(DMAy_Channelx == DMA1_Channel8)
     {
         DMA1->INTFCR |= DMA1_Channel8_IT_Mask;

@@ -230,13 +230,14 @@ void CAN_FilterInit(CAN_FilterInitTypeDef* CAN_FilterInitStruct)
   }
 
 #if defined (CH32V20x_D6)
-    {
-        uint32_t i;
+  if(((*(uint32_t *) 0x40022030) & 0x0F000000) == 0)
+  {
+    uint32_t i;
 
-        for(i = 0; i < 64; i++){
-            *(__IO uint16_t *)(0x40006000 + 512 + 4 * i) = *(__IO uint16_t *)(0x40006000 + 768 + 4 * i);
-        }
+    for(i = 0; i < 64; i++){
+        *(__IO uint16_t *)(0x40006000 + 512 + 4 * i) = *(__IO uint16_t *)(0x40006000 + 768 + 4 * i);
     }
+  }
 
 #endif
 

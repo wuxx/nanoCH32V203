@@ -343,7 +343,7 @@ void saveUpdatedFile(void)
 
         /*After the data is saved, compare the checksum. If the checksum is correct,
          * update the upgrade flag. Disconnect if checksum error.*/
-        if((iapPara.iapFileLen == (flashProgramLen + BIN_INF_LEN))){
+        if(iapPara.iapFileLen == (flashProgramLen + BIN_INF_LEN)){
             if(fileCheckSum == iapPara.iapFileCheckSum){
                 printf("FileCheckSum is right!\r\n");
                 u32 updateFlag = IMAGE_FLAG_UPDATE;

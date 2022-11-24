@@ -350,11 +350,10 @@ void RCC_PCLK1Config(uint32_t RCC_HCLK)
  *
  * @param   RCC_HCLK - defines the APB2 clock divider. This clock is derived from
  *        the AHB clock (HCLK).
- *            RCC_HCLK_Div1 - APB1 clock = HCLK.
- *            RCC_HCLK_Div2 - APB1 clock = HCLK/2.
- *            RCC_HCLK_Div4 - APB1 clock = HCLK/4.
- *            RCC_HCLK_Div8 - APB1 clock = HCLK/8.
- *            RCC_HCLK_Div16 - APB1 clock = HCLK/16.
+ *            RCC_PCLK2_Div2 - APB2 clock = HCLK.
+ *            RCC_PCLK2_Div4 - APB2 clock = HCLK/2.
+ *            RCC_PCLK2_Div6 - APB2 clock = HCLK/4.
+ *            RCC_PCLK2_Div8 - APB2 clock = HCLK/8.
  *
  * @return  none
  */
