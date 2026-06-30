@@ -17,6 +17,9 @@ nanoCH32V203 is a development board made by MuseLab based on WCH CH32V203C8T6 wi
 ![4](https://github.com/wuxx/nanoCH32V203/blob/master/doc/4.jpg)
 ![5](https://github.com/wuxx/nanoCH32V203/blob/master/doc/5.jpg)
 
+## Pin Diagram
+![nanoCH32V203 pin diagram](doc/nanoCH32V203_pin_diagram.jpg)
+
 # Feature
 - Dual USB interface, USB1 supports Device, USB2 supports Host/Device
 - Can be downloaded directly via USB without additional downloader
